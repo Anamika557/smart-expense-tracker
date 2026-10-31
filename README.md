@@ -1,24 +1,33 @@
-# Smart Expense Tracker
+# Smart Expense Tracker CLI
 
 ## Project Description
 
-Smart Expense Tracker is a simple Python-based command-line application that helps users record, view, and track their daily expenses.
+Smart Expense Tracker is a Python-based command-line application that helps users manage and track their daily expenses.
 
-It stores expense records in a CSV file and provides category-wise and overall expense summaries.
+It allows users to add, view, delete, filter, and summarize expenses. All expense records are stored in a JSON file. It also supports currency conversion using a free exchange-rate API.
 
 ## Features
 
-* Add new expenses.
+* Add new expenses with amount, category, and description.
 * View all recorded expenses.
-* Calculate category-wise expenses.
+* Delete expenses using their ID.
+* Filter expenses by category.
+* Filter expenses by date range.
+* Generate monthly category-wise summaries.
 * Calculate total expenses.
-* Validate user inputs.
-* Store expense records automatically in a CSV file.
+* Convert total expenses into another currency using an exchange-rate API.
+* Validate user inputs and display error messages.
+* Store expense records in JSON format.
 
 ## Technologies Used
 
 * Python
-* CSV File Handling
+* argparse
+* JSON
+* Dataclasses
+* Type Hints
+* Requests
+* Frankfurter Exchange Rate API
 
 ## Project Structure
 
@@ -26,28 +35,116 @@ It stores expense records in a CSV file and provides category-wise and overall e
 smart-expense-tracker/
 │
 ├── main.py
-├── expenses.csv
-└── README.md
+├── requirements.txt
+├── .gitignore
+├── README.md
+└── expenses.json  (generated automatically)
 ```
 
-## How to Run
+## Installation
 
-1. Clone or download the repository.
-2. Open the project folder in VS Code.
-3. Open the terminal.
-4. Run the following command:
+1. Clone the repository:
 
 ```bash
-python main.py
+git clone https://github.com/Anamika557/smart-expense-tracker.git
+```
+
+2. Navigate to the project directory:
+
+```bash
+cd smart-expense-tracker
+```
+
+3. Install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Usage
+
+### Add an Expense
+
+```bash
+python main.py add --amount 150 --category Food --description "Lunch"
+```
+
+### List All Expenses
+
+```bash
+python main.py list
+```
+
+### Delete an Expense
+
+```bash
+python main.py delete --id 1
+```
+
+### Filter by Category
+
+```bash
+python main.py filter --category Food
+```
+
+### Filter by Date Range
+
+```bash
+python main.py filter --start-date 2026-10-01 --end-date 2026-10-31
+```
+
+### Monthly Summary
+
+```bash
+python main.py summary --month 2026-10
+```
+
+### Calculate Total Expenses
+
+```bash
+python main.py total
+```
+
+### Currency Conversion
+
+```bash
+python main.py convert --from-currency INR --to-currency USD
+```
+
+### View Available Commands
+
+```bash
+python main.py --help
+```
+
+## Sample Output
+
+```text
+===== YOUR EXPENSES =====
+
+ID: 1 | Amount: 150.00 | Category: Food
+Description: Lunch | Date: 2026-10-31
+
+ID: 2 | Amount: 500.00 | Category: Travel
+Description: Bus ticket | Date: 2026-10-31
 ```
 
 ## Data Storage
 
-Expense records are stored in `expenses.csv` using CSV file handling. Each expense is saved with its amount, category, and description.
+Expense records are stored locally in `expenses.json`. The application automatically creates and updates this file whenever expenses are added or deleted.
 
-## Application Interface
+## Currency Conversion
 
-The application runs through a command-line interface (CLI), allowing users to interact with it through a menu.
+The application uses the Frankfurter Exchange Rate API to retrieve exchange rates and convert the total expense amount into the selected currency.
+
+## What I Learned
+
+* Working with Python command-line arguments using argparse.
+* Reading and writing JSON files.
+* Using dataclasses and type hints.
+* Implementing filtering and summary operations.
+* Integrating an external API using Requests.
+* Handling invalid inputs and errors.
 
 ## Author
 
