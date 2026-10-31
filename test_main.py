@@ -1,6 +1,10 @@
 import unittest
 import tempfile
+import io
+
 from pathlib import Path
+from datetime import date
+from contextlib import redirect_stdout
 from unittest.mock import patch
 
 import main
@@ -23,10 +27,12 @@ class TestExpenseTracker(unittest.TestCase):
 
     def test_add_expense(self):
         main.add_expense(150, "Food", "Lunch")
+
         expenses = main.load_expenses()
 
         self.assertEqual(len(expenses), 1)
         self.assertEqual(expenses[0].amount, 150)
+        self.assertEqual(expenses[0].category, "Food")
 
     def test_delete_expense(self):
         main.add_expense(150, "Food", "Lunch")
@@ -35,33 +41,56 @@ class TestExpenseTracker(unittest.TestCase):
         self.assertEqual(len(main.load_expenses()), 0)
 
     def test_invalid_amount(self):
-        main.add_expense(-50, "Food", "Lunch")
+        output = io.StringIO()
+
+        with redirect_stdout(output):
+            main.add_expense(-50, "Food", "Lunch")
 
         self.assertEqual(len(main.load_expenses()), 0)
+        self.assertIn("Invalid expense details", output.getvalue())
 
     def test_filter_by_category(self):
         main.add_expense(150, "Food", "Lunch")
         main.add_expense(500, "Travel", "Bus ticket")
 
         expenses = main.load_expenses()
+
         filtered = [
             expense for expense in expenses
-            if expense.category == "Food"
+            if expense.category.lower() == "food"
         ]
 
         self.assertEqual(len(filtered), 1)
+        self.assertEqual(filtered[0].amount, 150)
 
     def test_filter_by_date(self):
         main.add_expense(150, "Food", "Lunch")
 
+        today = date.today().isoformat()
         expenses = main.load_expenses()
 
         filtered = [
             expense for expense in expenses
-            if "2026-10-01" <= expense.date <= "2026-10-31"
+            if expense.date == today
         ]
 
         self.assertEqual(len(filtered), 1)
+
+    def test_monthly_summary(self):
+        main.add_expense(150, "Food", "Lunch")
+        main.add_expense(500, "Travel", "Bus ticket")
+
+        current_month = date.today().strftime("%Y-%m")
+        output = io.StringIO()
+
+        with redirect_stdout(output):
+            main.monthly_summary(current_month)
+
+        result = output.getvalue()
+
+        self.assertIn("Food: 150.00", result)
+        self.assertIn("Travel: 500.00", result)
+        self.assertIn("Total: 650.00", result)
 
 
 if __name__ == "__main__":
