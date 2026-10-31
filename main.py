@@ -37,15 +37,44 @@ def load_expenses() -> list[Expense]:
         with open(FILE_NAME, "r", encoding="utf-8") as file:
             data = json.load(file)
 
+        if not isinstance(data, list):
+            raise ValueError("Expense data must be a JSON list.")
+
         expenses = []
 
         for index, item in enumerate(data, start=1):
+
+            if not isinstance(item, dict):
+                raise ValueError(
+                    f"Invalid expense record at position {index}."
+                )
+
             item.setdefault("id", index)
-            expenses.append(Expense(**item))
+
+            try:
+                expense = Expense(**item)
+
+                ExpenseValidator(
+                    amount=expense.amount,
+                    category=expense.category,
+                    description=expense.description
+                )
+
+                date.fromisoformat(expense.date)
+
+                expenses.append(expense)
+
+            except (TypeError, ValueError, ValidationError) as error:
+                raise ValueError(
+                    f"Invalid expense record at position {index}: {error}"
+                )
 
         return expenses
 
-    except (json.JSONDecodeError, TypeError, KeyError) as error:
+    except json.JSONDecodeError as error:
+        raise ValueError(f"Invalid JSON file: {error}")
+
+    except OSError as error:
         raise ValueError(f"Could not read expenses.json: {error}")
 
 
