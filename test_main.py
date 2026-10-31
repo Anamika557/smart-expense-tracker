@@ -91,7 +91,14 @@ class TestExpenseTracker(unittest.TestCase):
         self.assertIn("Food: 150.00", result)
         self.assertIn("Travel: 500.00", result)
         self.assertIn("Total: 650.00", result)
+    def test_invalid_json_data(self):
+        self.test_file.write_text(
+            '{"invalid": "data"}',
+            encoding="utf-8"
+        )
 
+        with self.assertRaises(ValueError):
+            main.load_expenses()
 
 if __name__ == "__main__":
     unittest.main()
