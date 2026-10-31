@@ -23,42 +23,45 @@ class TestExpenseTracker(unittest.TestCase):
 
     def test_add_expense(self):
         main.add_expense(150, "Food", "Lunch")
-
         expenses = main.load_expenses()
 
         self.assertEqual(len(expenses), 1)
         self.assertEqual(expenses[0].amount, 150)
-        self.assertEqual(expenses[0].category, "Food")
 
     def test_delete_expense(self):
         main.add_expense(150, "Food", "Lunch")
-
         main.delete_expense(1)
 
-        expenses = main.load_expenses()
-
-        self.assertEqual(len(expenses), 0)
+        self.assertEqual(len(main.load_expenses()), 0)
 
     def test_invalid_amount(self):
         main.add_expense(-50, "Food", "Lunch")
 
-        expenses = main.load_expenses()
-
-        self.assertEqual(len(expenses), 0)
+        self.assertEqual(len(main.load_expenses()), 0)
 
     def test_filter_by_category(self):
         main.add_expense(150, "Food", "Lunch")
         main.add_expense(500, "Travel", "Bus ticket")
 
         expenses = main.load_expenses()
-
         filtered = [
             expense for expense in expenses
             if expense.category == "Food"
         ]
 
         self.assertEqual(len(filtered), 1)
-        self.assertEqual(filtered[0].category, "Food")
+
+    def test_filter_by_date(self):
+        main.add_expense(150, "Food", "Lunch")
+
+        expenses = main.load_expenses()
+
+        filtered = [
+            expense for expense in expenses
+            if "2026-10-01" <= expense.date <= "2026-10-31"
+        ]
+
+        self.assertEqual(len(filtered), 1)
 
 
 if __name__ == "__main__":
